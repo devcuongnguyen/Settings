@@ -5,26 +5,24 @@ namespace Backpack\Settings\app\Models;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Config;
 use Illuminate\Database\Eloquent\Model;
-use devcuongnguyen\CachingModel\Contracts\Cacheable;
-use devcuongnguyen\CachingModel\HasCache;
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 
-class Setting extends Model implements Cacheable
+class Setting extends Model
 {
     use CrudTrait;
-    use HasCache;
+    use Cachable;
 
+    protected $fillable = ['value'];
     protected $guarded = [];
+    protected $primaryKey = 'key';
+
+
 
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
 
         $this->table = config('backpack.settings.table_name');
-    }
-
-    public static function primaryCacheKey(): string
-    {
-        return 'key';
     }
 
     /**
@@ -36,13 +34,14 @@ class Setting extends Model implements Cacheable
      */
     public static function get($key)
     {
-        $setting = static::fromCache()->find($key);
+        $setting = new self();
+        $entry = $setting->where('key', $key)->first();
 
-        if (!$setting) {
+        if (!$entry) {
             return;
         }
 
-        return $setting->value;
+        return $entry->value;
     }
 
     /**
@@ -55,7 +54,7 @@ class Setting extends Model implements Cacheable
     {
         $database_prefix = config('backpack.settings.database_prefix');
 
-        $prefixed_key = !empty($database_prefix) ? $database_prefix.'.'.$key : $key;
+        $prefixed_key = !empty($database_prefix) ? $database_prefix . '.' . $key : $key;
         $setting = new self();
         $entry = $setting->where('key', $key)->firstOrFail();
 
