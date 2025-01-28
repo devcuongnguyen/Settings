@@ -97,10 +97,10 @@ class SettingsServiceProvider extends ServiceProvider
         $loader->alias('Setting', config('backpack.settings.model', \Backpack\Settings\app\Models\Setting::class));
 
         // use the vendor configuration file as fallback
-        // $this->mergeConfigFrom(
-        //     __DIR__ . '/config/backpack/settings.php',
-        //     'backpack.settings'
-        // );
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/backpack/settings.php',
+            'backpack.settings'
+        );
 
         foreach (glob(__DIR__ . '/Helper/*.php') as $filename) {
             require_once $filename;
